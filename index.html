@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Golbert Gautier Kamanzi, software engineer in Kigali. Full-stack web and mobile apps for farmers, students, landlords and local businesses.">
+<!-- page -->
+<title>Golbert Gautier Kamanzi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: one narrow reading column; an imigongo zigzag band frames the page top and bottom; projects are full-width rows, meta left and story right. */
+:root {
+  --paper: #f5f7f3;
+  --ink: #16201a;
+  --muted: #56635b;
+  --line: #d6ddd7;
+  --hill: #2c6a4e;
+  --clay: #9b3a25;
+  --raised: #ffffff;
+  --display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --body: "Schibsted Grotesk", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --step--1: 0.875rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.3rem;
+  --step-2: 1.75rem;
+  --step-3: clamp(2.1rem, 6.2vw, 4.4rem);
+  --measure: 64ch;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111814; --ink: #e6ece7; --muted: #9aa8a0; --line: #2a352f;
+    --hill: #7cc4a0; --clay: #d0705a; --raised: #18211c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111814; --ink: #e6ece7; --muted: #9aa8a0; --line: #2a352f;
+  --hill: #7cc4a0; --clay: #d0705a; --raised: #18211c; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 var(--step-0)/1.6 var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration-color: var(--hill); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+a:hover { color: var(--hill); }
+:focus-visible { outline: 3px solid var(--hill); outline-offset: 3px; border-radius: 2px; }
+
+/* Imigongo band: the one bold element */
+.band {
+  height: 28px;
+  --c: var(--clay);
+  background:
+    linear-gradient(135deg, var(--c) 25%, transparent 25%) -14px 0 / 28px 28px,
+    linear-gradient(225deg, var(--c) 25%, transparent 25%) -14px 0 / 28px 28px,
+    linear-gradient(315deg, var(--ink) 25%, transparent 25%) 0 0 / 28px 28px,
+    linear-gradient(45deg, var(--ink) 25%, transparent 25%) 0 0 / 28px 28px,
+    var(--paper);
+}
+
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+}
+
+/* Top nav */
+.nav { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; padding-block: 20px; }
+.nav .mark { font: 700 1rem/1 var(--display); text-decoration: none; letter-spacing: -0.01em; }
+.nav ul { display: flex; flex-wrap: wrap; gap: 6px 22px; list-style: none; margin: 0; padding: 0; font-size: var(--step--1); font-weight: 500; }
+.nav ul a { text-decoration: none; }
+.nav ul a:hover { text-decoration: underline; }
+
+/* Hero */
+.hero { padding-block: 56px 72px; display: grid; gap: 28px; }
+.hero h1 {
+  font: 700 var(--step-3)/0.98 var(--display);
+  letter-spacing: -0.035em;
+  margin: 0;
+  text-wrap: balance;
+  max-width: 15ch;
+}
+.hero .lede { font-size: var(--step-1); line-height: 1.5; max-width: 34ch; margin: 0; color: var(--ink); }
+.hero .lede span { color: var(--muted); }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 20px; border-radius: 999px;
+  font: 600 var(--step--1)/1 var(--body); text-decoration: none;
+  border: 2px solid var(--ink);
+}
+.btn.primary { background: var(--ink); color: var(--paper); }
+.btn.primary:hover { background: var(--hill); border-color: var(--hill); color: var(--paper); }
+.btn:not(.primary):hover { border-color: var(--hill); color: var(--hill); }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 8px 0 0; padding: 0; list-style: none; font-size: var(--step--1); color: var(--muted); }
+.facts strong { color: var(--ink); font-weight: 600; }
+
+/* Sections */
+section { padding-block: 64px; border-top: 1px solid var(--line); }
+section > .wrap > h2 {
+  font: 700 var(--step-2)/1.1 var(--display);
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+}
+.intro { color: var(--muted); max-width: var(--measure); margin: 0 0 40px; }
+
+/* Projects */
+.project {
+  display: grid;
+  grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+  gap: 16px 48px;
+  padding-block: 36px;
+  border-top: 1px solid var(--line);
+}
+.project:first-of-type { border-top: 0; padding-top: 8px; }
+.project .meta { display: grid; gap: 14px; align-content: start; }
+.project h3 { font: 700 var(--step-1)/1.15 var(--display); letter-spacing: -0.015em; margin: 0; }
+.tag {
+  justify-self: start;
+  font-size: 0.8rem; font-weight: 600;
+  padding: 4px 10px; border-radius: 999px;
+  border: 1.5px solid var(--line); color: var(--muted);
+}
+.tag.client { border-color: var(--clay); color: var(--clay); }
+.links { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: var(--step--1); font-weight: 600; }
+.story { min-width: 0; max-width: var(--measure); }
+.story p { margin: 0 0 14px; }
+.story ul { margin: 0 0 18px; padding-left: 1.1em; }
+.story li { margin-bottom: 6px; }
+.story li::marker { color: var(--hill); }
+.stack { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 0; }
+.stack li { font-size: 0.8rem; font-weight: 500; padding: 3px 9px; border-radius: 6px; background: var(--raised); border: 1px solid var(--line); margin: 0; }
+
+/* Journey: a real chronology */
+.timeline { list-style: none; margin: 0; padding: 0; max-width: 760px; }
+.timeline li { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 4px 28px; padding-block: 18px; border-top: 1px solid var(--line); }
+.timeline li:first-child { border-top: 0; }
+.timeline .when { font-weight: 600; color: var(--hill); font-variant-numeric: tabular-nums; }
+.timeline h3 { font: 600 var(--step-0)/1.35 var(--body); margin: 0 0 4px; }
+.timeline p { margin: 0; color: var(--muted); }
+
+/* Skills */
+.skills { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px 40px; }
+.skills h3 { font: 600 var(--step-0)/1.3 var(--body); margin: 0 0 10px; }
+.skills ul { list-style: none; margin: 0; padding: 0; color: var(--muted); }
+.skills li { padding-block: 3px; }
+
+/* Contact */
+.contact { display: grid; gap: 28px; }
+.contact .big { font: 700 var(--step-2)/1.15 var(--display); letter-spacing: -0.02em; margin: 0; max-width: 20ch; text-wrap: balance; }
+.channels { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.channel { padding: 18px 20px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--raised); display: grid; gap: 4px; min-width: 0; }
+.channel span { font-size: var(--step--1); color: var(--muted); }
+.channel strong { font-weight: 600; overflow-wrap: anywhere; user-select: all; }
+.channel button {
+  justify-self: start; margin-top: 6px; cursor: pointer;
+  font: 600 0.8rem/1 var(--body); color: var(--ink);
+  background: transparent; border: 1.5px solid var(--line); border-radius: 999px; padding: 6px 12px;
+}
+.channel button:hover { border-color: var(--hill); color: var(--hill); }
+
+footer { padding-block: 28px 40px; font-size: var(--step--1); color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+
+@media (max-width: 720px) {
+  .project { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .timeline li { grid-template-columns: minmax(0, 1fr); }
+  .hero { padding-block: 32px 48px; }
+  section { padding-block: 48px; }
+}
+</style>
+</head>
+<body>
+
+<div class="band" aria-hidden="true"></div>
+
+<header class="wrap nav">
+  <a class="mark" href="#top" id="top">Kamanzi</a>
+  <nav aria-label="Sections">
+    <ul>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#journey">Journey</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <h1>Golbert Gautier Kamanzi</h1>
+    <p class="lede">Software engineer in Kigali. <span>I build full-stack web and mobile apps for farmers, students, landlords and small businesses, two of them for paying clients.</span></p>
+    <div class="actions">
+      <a class="btn primary" href="#projects">See my projects</a>
+      <a class="btn" href="resume.pdf">Download resume</a>
+      <a class="btn" href="https://github.com/kamanzi2025">GitHub</a>
+      <a class="btn" href="https://www.linkedin.com/in/kamanzi-gautier-golbert-06b6b6360/">LinkedIn</a>
+    </div>
+    <ul class="facts">
+      <li><strong>Studying</strong> Software Engineering, African Leadership University</li>
+      <li><strong>Open to</strong> internships and junior roles, Kigali or remote</li>
+    </ul>
+  </div>
+
+  <section id="projects">
+    <div class="wrap">
+      <h2>Projects</h2>
+      <p class="intro">Six apps I designed and built on my own, from the database to the screen. Two are in daily use by local businesses.</p>
+
+      <article class="project" id="agrismart">
+        <div class="meta">
+          <h3>AgriSmart</h3>
+          <span class="tag">Web and mobile app</span>
+          <div class="links">
+            <a href="https://agrismart-seven.vercel.app">Live app</a>
+            <a href="https://github.com/kamanzi2025/Agrismart">Code</a>
+          </div>
+        </div>
+        <div class="story">
+          <p>Helps smallholder bean farmers in East Africa decide when to plant, how much to water and how to deal with pests, using live weather for their location.</p>
+          <ul>
+            <li>Planting advice built on Rwanda's two bean seasons and real agronomic thresholds, checked against a 5-day forecast.</li>
+            <li>Daily watering plan by growth stage, compared against expected rainfall.</li>
+            <li>Searchable library of common bean pests and diseases, with treatment and prevention steps.</li>
+            <li>Income and expense tracker that works offline.</li>
+          </ul>
+          <ul class="stack" aria-label="Tech used">
+            <li>React</li><li>TypeScript</li><li>Node.js</li><li>Express</li><li>Prisma</li><li>Expo</li><li>JWT auth</li><li>Vercel</li><li>Render</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="project" id="cafecampus">
+        <div class="meta">
+          <h3>CaféCampus</h3>
+          <span class="tag">Web platform</span>
+          <div class="links">
+            <a href="https://cafecampus.vercel.app">Live app</a>
+            <a href="https://github.com/kamanzi2025/school-cafeteria">Code</a>
+          </div>
+        </div>
+        <div class="story">
+          <p>A food-ordering platform for a school campus. Students order from several restaurants, and each restaurant runs its own menu, orders and promotions.</p>
+          <ul>
+            <li>Students can order as a guest, with an account, or with their student ID, and earn loyalty points.</li>
+            <li>Restaurants sign themselves up and go live straight away, with sales analytics on their dashboard.</li>
+            <li>Orders and menu changes update live for everyone through WebSockets.</li>
+            <li>A super-admin panel to approve, suspend or remove restaurants.</li>
+          </ul>
+          <ul class="stack" aria-label="Tech used">
+            <li>React</li><li>Tailwind</li><li>Zustand</li><li>Node.js</li><li>Express</li><li>Prisma</li><li>Socket.io</li><li>GitHub Actions</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="project" id="autoparts">
+        <div class="meta">
+          <h3>AutoParts Store Manager</h3>
+          <span class="tag client">Client project</span>
+          <div class="links">
+            <a href="https://github.com/kamanzi2025/brian-">Code</a>
+          </div>
+        </div>
+        <div class="story">
+          <p>Business software built for an auto parts shop to run sales, stock and accounting in one place. It installs like an app and keeps working when the internet drops.</p>
+          <ul>
+            <li>Sales, quotations, returns, purchases, suppliers, payments and stock transfers.</li>
+            <li>Full financial reports: profit and loss, balance sheet, cash flow, and money owed in and out.</li>
+            <li>Data saves on the device first and syncs to the cloud when the connection comes back.</li>
+          </ul>
+          <ul class="stack" aria-label="Tech used">
+            <li>React</li><li>PWA</li><li>IndexedDB (Dexie)</li><li>Supabase</li><li>Tailwind</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="project" id="sand-supply">
+        <div class="meta">
+          <h3>Sand Supply Manager</h3>
+          <span class="tag client">Client project</span>
+          <div class="links">
+            <a href="https://github.com/kamanzi2025/sand-business-management-">Code</a>
+          </div>
+        </div>
+        <div class="story">
+          <p>An operations tracker built for a sand supply business, replacing paper records for orders, customers and tax.</p>
+          <ul>
+            <li>Order and customer management with a dashboard of sales trends.</li>
+            <li>VAT summaries, with reports exported to Excel and PDF.</li>
+            <li>Automatic nightly backups of the database.</li>
+          </ul>
+          <ul class="stack" aria-label="Tech used">
+            <li>React</li><li>Tailwind</li><li>Node.js</li><li>Express</li><li>libSQL</li><li>Vercel serverless</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="project" id="apartment-manager">
+        <div class="meta">
+          <h3>Apartment Manager</h3>
+          <span class="tag">Web platform</span>
+          <div class="links">
+            <a href="https://github.com/kamanzi2025/realestate-management-">Code</a>
+          </div>
+        </div>
+        <div class="story">
+          <p>A portal that connects landlords and tenants. Landlords track units, rent and building costs; tenants handle their lease and requests without phone calls.</p>
+          <ul>
+            <li>Landlord side: units, rent collection, expenses, building costs and financial overview.</li>
+            <li>Tenant side: lease details, maintenance requests, notifications and move-out.</li>
+            <li>Built-in messaging between landlord and tenants.</li>
+          </ul>
+          <ul class="stack" aria-label="Tech used">
+            <li>Next.js</li><li>TypeScript</li><li>Supabase</li><li>Tailwind</li><li>shadcn/ui</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="project" id="launchpad">
+        <div class="meta">
+          <h3>LaunchPad</h3>
+          <span class="tag">Mobile app</span>
+          <div class="links">
+            <a href="https://github.com/kamanzi2025/flutter_formative">Code</a>
+          </div>
+        </div>
+        <div class="story">
+          <p>A mobile app that connects ALU students with internships at student-led startups.</p>
+          <ul>
+            <li>Shows how well each opportunity matches a student's skills.</li>
+            <li>Students apply, bookmark roles and track their applications in the app.</li>
+            <li>Feature-based clean architecture, with each decision documented.</li>
+          </ul>
+          <ul class="stack" aria-label="Tech used">
+            <li>Flutter</li><li>Dart</li><li>Riverpod</li><li>Firebase Auth</li><li>Firestore</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="journey">
+    <div class="wrap">
+      <h2>Journey</h2>
+      <p class="intro">From maths and computer science in high school to building software people pay for.</p>
+      <ol class="timeline">
+        <li>
+          <span class="when">2018–2021</span>
+          <div>
+            <h3>Nu-Vision High School</h3>
+            <p>Studied Mathematics, Computer Science and Economics and earned the Rwanda Advanced Certificate of Education. As club president, I organised yearly outreach to support less fortunate communities.</p>
+          </div>
+        </li>
+        <li>
+          <span class="when">2022–2024</span>
+          <div>
+            <h3>Certifications</h3>
+            <p>Built a base in IT and the cloud with Google IT Support, Microsoft IT Support Specialist, and identity and access management on Azure and AWS.</p>
+          </div>
+        </li>
+        <li>
+          <span class="when">2024</span>
+          <div>
+            <h3>African Leadership University</h3>
+            <p>Started a Bachelor of Software Engineering, majoring in full-stack development: front end, back end, databases, APIs and algorithms.</p>
+          </div>
+        </li>
+        <li>
+          <span class="when">2026</span>
+          <div>
+            <h3>First client projects</h3>
+            <p>Built and delivered management software for an auto parts shop and a sand supply business, alongside full-stack apps for farming, campus food and housing.</p>
+          </div>
+        </li>
+        <li>
+          <span class="when">Next</span>
+          <div>
+            <h3>Looking for my first role</h3>
+            <p>Seeking an internship or junior position in software engineering, where I can ship features to real users.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="wrap">
+      <h2>Skills and certifications</h2>
+      <p class="intro">What I use to build, and what I've been certified in.</p>
+      <div class="skills">
+        <div>
+          <h3>Front end</h3>
+          <ul><li>React, Next.js</li><li>JavaScript, TypeScript</li><li>Tailwind CSS</li><li>Flutter and Dart</li><li>Progressive web apps</li></ul>
+        </div>
+        <div>
+          <h3>Back end and data</h3>
+          <ul><li>Node.js, Express</li><li>Python, FastAPI</li><li>Prisma, SQL</li><li>MySQL, Oracle, Supabase</li><li>Firebase, WebSockets</li></ul>
+        </div>
+        <div>
+          <h3>Cloud and tools</h3>
+          <ul><li>Vercel, Render</li><li>Azure, AWS</li><li>Identity and access management</li><li>Git, GitHub Actions</li></ul>
+        </div>
+        <div>
+          <h3>Certifications</h3>
+          <ul><li>Secure Access with Azure AD (Microsoft)</li><li>Azure and AWS IAM (Whizlabs)</li><li>Google IT Support</li><li>Microsoft IT Support Specialist</li><li>Software Engineering, Python, Cloud Computing (Coursera)</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="wrap contact">
+      <h2 class="big">Hiring an engineer who ships? Let's talk.</h2>
+      <div class="channels">
+        <div class="channel">
+          <span>Email</span>
+          <strong id="email">kamanzigolbert@gmail.com</strong>
+          <button type="button" id="copy-email" data-copy="kamanzigolbert@gmail.com">Copy email</button>
+        </div>
+        <div class="channel">
+          <span>Phone and WhatsApp</span>
+          <strong id="phone">+250 783 363 830</strong>
+          <button type="button" id="copy-phone" data-copy="+250783363830">Copy number</button>
+        </div>
+        <div class="channel">
+          <span>LinkedIn</span>
+          <strong><a href="https://www.linkedin.com/in/kamanzi-gautier-golbert-06b6b6360/">kamanzi-gautier-golbert</a></strong>
+        </div>
+        <div class="channel">
+          <span>GitHub</span>
+          <strong><a href="https://github.com/kamanzi2025">kamanzi2025</a></strong>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <span>Golbert Gautier Kamanzi, Kigali, Rwanda</span>
+  <a href="#top">Back to top</a>
+</footer>
+<div class="band" aria-hidden="true"></div>
+
+<script>
+document.querySelectorAll('[data-copy]').forEach(function (btn) {
+  var label = btn.textContent;
+  btn.addEventListener('click', function () {
+    var text = btn.getAttribute('data-copy');
+    var done = function () { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = label; }, 1600); };
+    var fallback = function () {
+      var el = btn.previousElementSibling;
+      var r = document.createRange(); r.selectNodeContents(el);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      btn.textContent = 'Selected, press Ctrl+C';
+    };
+    try {
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } catch (e) { fallback(); }
+  });
+});
+</script>
+<!-- /page -->
+</body>
+</html>
