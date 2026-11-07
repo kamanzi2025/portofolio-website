@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GOLBERT: The Series</title>
+<meta name="description" content="Golbert Gautier Kamanzi, Software Engineering student at African Leadership University in Kigali. Full-stack development, cloud and identity & access management.">
+<meta name="theme-color" content="#0B0B0F">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230B0B0F'/%3E%3Ctext x='16' y='25' font-family='Impact,Arial Narrow,sans-serif' font-size='24' fill='%23E50914' text-anchor='middle'%3EG%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Screen 1: intro -->
+<button type="button" class="screen intro" id="intro" hidden aria-label="GOLBERT: The Series. Skip intro">
+  <span class="intro-logo" aria-hidden="true">GOLBERT</span>
+  <span class="intro-sub" aria-hidden="true">THE SERIES</span>
+  <span class="intro-skip" aria-hidden="true">Click anywhere to skip</span>
+</button>
+
+<!-- Screen 2: who's watching -->
+<section class="screen profiles" id="profiles" hidden aria-labelledby="profiles-title">
+  <h1 class="profiles-title" id="profiles-title">Who's watching?</h1>
+  <ul class="profile-list" id="profile-list"></ul>
+  <p class="profiles-note">Every profile watches the same true story of Golbert Kamanzi — it only changes what plays first.</p>
+</section>
+
+<!-- Screen 3: browse -->
+<div class="screen browse" id="browse" hidden>
+  <a class="skip-link" href="#rows">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="nav-left">
+      <a class="logo" href="#top" aria-label="GOLBERT: The Series, home">GOLBERT<span class="logo-tag">SERIES</span></a>
+      <nav aria-label="Sections">
+        <ul class="nav-links">
+          <li><a href="#top">Home</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#journey">Journey</a></li>
+          <li><a href="#certificates">Certificates</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+    <button type="button" class="switch" id="switch-profile" aria-label="Switch profile">
+      <span class="switch-name" id="switch-name"></span>
+      <span class="switch-chip" id="switch-chip" aria-hidden="true"></span>
+    </button>
+  </header>
+
+  <main>
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="hero-kicker" id="hero-kicker"></p>
+        <h1 class="hero-title" id="hero-title" tabindex="-1">GOLBERT</h1>
+        <p class="hero-sub">THE SERIES</p>
+        <ul class="hero-meta" id="hero-meta"></ul>
+        <p class="hero-genre">FULL-STACK DEVELOPER · CLOUD · IAM</p>
+        <p class="hero-synopsis" id="hero-synopsis"></p>
+        <div class="hero-actions">
+          <button type="button" class="btn btn-white" id="play-intro"><span aria-hidden="true">▶</span> Play intro</button>
+          <a class="btn btn-grey" id="hero-resume" href="#" target="_blank" rel="noopener">View Résumé</a>
+          <a class="btn-round" href="#contact" aria-label="More info: contact details"><span aria-hidden="true">i</span></a>
+        </div>
+      </div>
+      <figure class="hero-photo" id="hero-photo"></figure>
+    </section>
+
+    <div id="rows"></div>
+  </main>
+
+  <footer class="footer" id="contact" aria-labelledby="footer-title">
+    <div class="footer-inner">
+      <p class="kicker">THE NEXT SEASON</p>
+      <h2 class="footer-title" id="footer-title">To be continued...</h2>
+      <p class="footer-copy">The next episode could be on your team. I'm open to internships and junior roles in full-stack, cloud and IT support.</p>
+      <div class="footer-actions" id="footer-actions"></div>
+      <div class="footer-bottom">
+        <span>© 2026 Golbert Gautier Kamanzi · A personal portfolio</span>
+        <span id="footer-contact"></span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
