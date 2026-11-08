@@ -383,7 +383,7 @@ var SITE = {
         chips.forEach(function (c) { c.setAttribute("aria-pressed", c === chip); });
         track.innerHTML = certItems(chip.getAttribute("data-group"));
         track.scrollLeft = 0;
-        track.dispatchEvent(new Event("scroll"));
+        if (track._watchEnds) track._watchEnds();
       });
     });
   }
@@ -406,7 +406,7 @@ var SITE = {
     originals: function () {
       var items = SITE.projects.map(function (p) {
         var main = p.live || p.code;
-        var shot = p.image ? '<span class="poster-shot" style="background-image:url(\'' + esc(p.image) + '\')" aria-hidden="true"></span>' : "";
+        var shot = p.image ? '<img class="poster-shot" src="' + esc(p.image) + '" alt="" width="520" height="600" loading="lazy" decoding="async">' : "";
         var tags = (p.client ? '<span class="client">Client project</span>' : "") +
           p.tags.map(function (t) { return "<span>" + esc(t) + "</span>"; }).join("");
         var label = p.title + ". " + p.desc + (p.live ? " Live demo" : " Code on GitHub") + ", opens in a new tab";
@@ -525,40 +525,35 @@ var SITE = {
     }, false);
   }
 
-  /* ---------- Rows: wheel, touch, arrows ---------- */
+  /* ---------- Rows: native sideways scroll + arrow buttons ---------- */
 
+  // Trackpads, shift + wheel and touch scroll the rows natively. The ‹ › buttons page
+  // through them on desktop. Arrow state comes from IntersectionObserver watching the
+  // first and last items, so nothing reads layout while scrolling.
   function initRow(rowEl) {
     var track = $(".row-track", rowEl);
     var prev = $(".row-arrow.prev", rowEl);
     var next = $(".row-arrow.next", rowEl);
-    function update() {
-      var max = track.scrollWidth - track.clientWidth - 2;
-      prev.disabled = track.scrollLeft <= 2;
-      next.disabled = track.scrollLeft >= max;
-    }
     function page(dir) {
-      track.scrollBy({ left: dir * track.clientWidth * 0.85, behavior: reduceMotion ? "auto" : "smooth" });
+      track.scrollBy({ left: dir * track.clientWidth * 0.9, behavior: reduceMotion ? "auto" : "smooth" });
     }
     prev.addEventListener("click", function () { page(-1); });
     next.addEventListener("click", function () { page(1); });
-    track.addEventListener("scroll", update, { passive: true });
-    // Re-measure when the row becomes visible or changes size.
-    if ("ResizeObserver" in window) new ResizeObserver(update).observe(track);
-    else window.addEventListener("resize", update);
-    // Vertical wheel scrolls the row sideways until it reaches an end, then the page scrolls.
-    track.addEventListener("wheel", function (e) {
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey) return;
-      var max = track.scrollWidth - track.clientWidth;
-      if (max <= 0) return;
-      var d = e.deltaMode === 1 ? e.deltaY * 32 : e.deltaY;
-      if ((d < 0 && track.scrollLeft <= 0) || (d > 0 && track.scrollLeft >= max - 1)) return;
-      e.preventDefault();
-      track.style.scrollSnapType = "none";
-      track.scrollLeft += d;
-      clearTimeout(track._snap);
-      track._snap = setTimeout(function () { track.style.scrollSnapType = ""; }, 160);
-    }, { passive: false });
-    update();
+
+    if (!("IntersectionObserver" in window)) { prev.disabled = next.disabled = false; return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        var btn = en.target === track.firstElementChild ? prev : next;
+        btn.disabled = en.isIntersecting;
+      });
+    }, { root: track, threshold: 0.98 });
+    track._watchEnds = function () {
+      io.disconnect();
+      if (!track.firstElementChild) return;
+      io.observe(track.firstElementChild);
+      io.observe(track.lastElementChild);
+    };
+    track._watchEnds();
   }
 
   /* ---------- Reveal on scroll ---------- */
@@ -638,6 +633,7 @@ var SITE = {
       sec.className = "block";
       sec.id = c.id;
       sec.setAttribute("data-section", key);
+      sec.setAttribute("tabindex", "-1");
       sec.innerHTML = c.html;
       var h = $(".block-title", sec);
       if (h) { h.id = c.id + "-title"; sec.setAttribute("aria-labelledby", h.id); }
@@ -653,10 +649,21 @@ var SITE = {
   var screens = { intro: $("#intro"), profiles: $("#profiles"), browse: $("#browse") };
   var introTimer = null;
 
+  // Lenis (js/smooth-scroll.js) is optional: always check window.lenis first.
+  function scrollToTop() {
+    if (window.lenis) { window.lenis.scrollTo(0, { immediate: true, force: true }); return; }
+    try { window.scrollTo({ top: 0, left: 0, behavior: "instant" }); }
+    catch (e) { window.scrollTo(0, 0); }
+  }
+
   function show(name) {
     Object.keys(screens).forEach(function (k) { screens[k].hidden = k !== name; });
-    window.scrollTo(0, 0);
+    scrollToTop();
     document.body.setAttribute("data-screen", name);
+    if (window.lenis) {
+      if (name === "intro") window.lenis.stop();
+      else window.lenis.start();
+    }
   }
 
   function goIntro() {
@@ -687,6 +694,7 @@ var SITE = {
   function goBrowse(profile) {
     renderBrowse(profile);
     show("browse");
+    if (window.lenis) window.lenis.resize(); // the sections were just reordered
     $("#hero-title").focus({ preventScroll: true });
   }
 
@@ -695,9 +703,12 @@ var SITE = {
   $("#switch-profile").addEventListener("click", goProfiles);
 
   var nav = $("#nav");
-  window.addEventListener("scroll", function () {
-    nav.classList.toggle("is-scrolled", window.scrollY > 40);
-  }, { passive: true });
+  var sentinel = $("#nav-sentinel");
+  if ("IntersectionObserver" in window && sentinel) {
+    new IntersectionObserver(function (entries) {
+      nav.classList.toggle("is-scrolled", !entries[0].isIntersecting);
+    }).observe(sentinel);
+  }
 
   renderStatic();
 

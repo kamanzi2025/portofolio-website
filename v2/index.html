@@ -10,7 +10,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/lenis@1.3.26/dist/lenis.css">
 <link rel="stylesheet" href="css/style.css">
+<script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js" defer></script>
+<script src="js/smooth-scroll.js" defer></script>
 </head>
 <body>
 
@@ -31,6 +34,7 @@
 <!-- Screen 3: browse -->
 <div class="screen browse" id="browse" hidden>
   <a class="skip-link" href="#rows">Skip to content</a>
+  <div class="nav-sentinel" id="nav-sentinel" aria-hidden="true"></div>
 
   <header class="nav" id="nav">
     <div class="nav-left">
@@ -52,7 +56,7 @@
   </header>
 
   <main>
-    <section class="hero" id="top" aria-labelledby="hero-title">
+    <section class="hero" id="top" tabindex="-1" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="hero-kicker" id="hero-kicker"></p>
         <h1 class="hero-title" id="hero-title" tabindex="-1">GOLBERT</h1>
@@ -69,10 +73,10 @@
       <figure class="hero-photo" id="hero-photo"></figure>
     </section>
 
-    <div id="rows"></div>
+    <div id="rows" tabindex="-1"></div>
   </main>
 
-  <footer class="footer" id="contact" aria-labelledby="footer-title">
+  <footer class="footer" id="contact" tabindex="-1" aria-labelledby="footer-title">
     <div class="footer-inner">
       <p class="kicker">THE NEXT SEASON</p>
       <h2 class="footer-title" id="footer-title">To be continued...</h2>

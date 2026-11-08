@@ -37,7 +37,17 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+/* Lenis (js/smooth-scroll.js) adds .lenis to <html> when it runs. These native fallbacks
+   only apply when it doesn't (reduced motion, or the CDN failed). */
+@media (prefers-reduced-motion: no-preference) {
+  html:not(.lenis) { scroll-behavior: smooth; }
+}
+html:not(.lenis) :is(.hero, .block, .footer, #rows) { scroll-margin-top: 90px; }
+@media (max-width: 960px) {
+  html:not(.lenis) :is(.hero, .block, .footer, #rows) { scroll-margin-top: 102px; } /* the nav wraps to two rows */
+}
+[tabindex="-1"]:focus { outline: none; }
+.nav-sentinel { position: absolute; top: 40px; left: 0; width: 1px; height: 1px; pointer-events: none; }
 body {
   margin: 0;
   background: var(--bg);
@@ -309,8 +319,9 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .block-title { font: 700 clamp(20px, 2.2vw, 26px)/1.2 var(--body); letter-spacing: -.01em; }
 .block-body { padding: 0 var(--gutter); }
 
-.reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
-.reveal.is-in { opacity: 1; transform: none; }
+/* The section box itself never moves, so anchor links always land in the right place. */
+.reveal > * { opacity: 0; transform: translateY(24px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.reveal.is-in > * { opacity: 1; transform: none; }
 
 /* ---------- Horizontal rows ---------- */
 .row { position: relative; }
@@ -348,12 +359,19 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .tile {
   position: relative; display: block; text-decoration: none;
   border-radius: var(--r);
-  transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+  transition: transform .3s var(--ease);
 }
-.tile:hover, .tile:focus-visible {
-  transform: scale(1.06); z-index: 3;
+.tile:hover, .tile:focus-visible { transform: scale(1.06); z-index: 3; }
+.row-track > li { position: relative; }
+.row-track > li::after {
+  content: ""; position: absolute; z-index: 2; pointer-events: none;
+  inset: 0; border-radius: var(--r);
   box-shadow: 0 18px 40px rgba(0, 0, 0, .7), 0 6px 14px rgba(0, 0, 0, .5);
+  opacity: 0;
+  transition: opacity .3s var(--ease), transform .3s var(--ease);
 }
+.row-track > li:has(> .tile:hover, > .tile:focus-visible)::after { opacity: 1; transform: scale(1.06); }
+.row-track > li:has(> .pick)::after { content: none; }
 
 /* Continue exploring */
 .episode { width: 300px; background: var(--card); border: 1px solid var(--line); overflow: hidden; }
@@ -498,8 +516,9 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .poster::before { z-index: 1; }
 .poster > * { position: relative; z-index: 2; }
 .poster > .poster-shot {
-  position: absolute; z-index: 0; top: 0; right: 0; bottom: 0; width: 46%;
-  background-size: cover; background-position: left top;
+  position: absolute; z-index: 0; top: 0; right: 0; bottom: 0;
+  width: 46%; height: 100%; max-width: none;
+  object-fit: cover; object-position: left top;
   filter: brightness(.72) saturate(.95);
   -webkit-mask-image: linear-gradient(to left, #000 55%, transparent);
   mask-image: linear-gradient(to left, #000 55%, transparent);
@@ -588,14 +607,17 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .pick-poster {
   position: relative; width: 140px; height: 210px; border-radius: var(--r-sm);
   padding: 12px; display: flex; flex-direction: column; justify-content: space-between;
-  overflow: hidden;
-  transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+  transition: transform .3s var(--ease);
 }
-.pick:hover .pick-poster, .pick:focus-visible .pick-poster {
-  transform: scale(1.06);
+.pick:hover .pick-poster, .pick:focus-visible .pick-poster { transform: scale(1.06); }
+.pick-poster::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
   box-shadow: 0 18px 40px rgba(0, 0, 0, .7);
+  opacity: 0; transition: opacity .3s var(--ease);
 }
-.pick-poster::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0, 0, 0, .75), rgba(0, 0, 0, 0) 60%); }
+.pick:hover .pick-poster::after, .pick:focus-visible .pick-poster::after { opacity: 1; }
+.pick-poster { isolation: isolate; }
+.pick-poster::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(to top, rgba(0, 0, 0, .75), rgba(0, 0, 0, 0) 60%); }
 .pick-poster > * { position: relative; }
 .pick-poster .poster-badge { font-size: 13px; }
 .pick-poster .poster-badge b { font-size: 17px; }
@@ -709,14 +731,13 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
   *, *::before, *::after {
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
     animation-delay: 0s !important;
     transition-duration: .01ms !important;
   }
-  .reveal { opacity: 1; transform: none; }
+  .reveal > * { opacity: 1; transform: none; }
   .tile:hover, .tile:focus-visible,
   .pick:hover .pick-poster, .pick:focus-visible .pick-poster,
   .profile:hover .profile-avatar, .profile:focus-visible .profile-avatar { transform: none; }
