@@ -33,10 +33,15 @@
   // ?smooth=0 turns Lenis off, to compare against native scrolling.
   var disabled = /[?&]smooth=0(&|$)/.test(window.location.search);
 
+  // With GSAP present, Lenis runs on GSAP's ticker so scroll and the scene
+  // animations share one frame loop; otherwise it drives itself (autoRaf).
+  var gsap = window.gsap, ST = window.ScrollTrigger;
+  var onTicker = !!(gsap && ST);
+
   if (!reduce && !disabled && typeof Lenis !== "undefined") {
     try {
       lenis = new Lenis({
-        autoRaf: true,
+        autoRaf: !onTicker,
         lerp: 0.1,
         smoothWheel: true,
         syncTouch: false,          // phones keep their own native momentum
@@ -48,11 +53,22 @@
         stopInertiaOnNavigate: true,
         autoResize: true
       });
+      if (onTicker) {
+        lenis.on("scroll", ST.update);
+        gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
+        gsap.ticker.lagSmoothing(0);
+      }
     } catch (e) {
       lenis = null;
     }
   }
   window.lenis = lenis;
+
+  // The scene stage (js/stage.js) owns in-page navigation while it's active.
+  function stageKey(id) {
+    var st = window.GolbertStage;
+    return st && st.active ? st.keyFor(id) : null;
+  }
 
   // Shift + wheel over a sideways row: let the browser scroll the row natively.
   // (Lenis skips events flagged with lenisStopPropagation.) Passive, no layout reads.
@@ -74,6 +90,15 @@
     var link = e.target.closest ? e.target.closest('a[href^="#"]') : null;
     if (!link) return;
     var id = decodeURIComponent(link.getAttribute("href").slice(1));
+    var key = id && stageKey(id);
+    if (key) {
+      e.preventDefault();
+      if (window.location.hash !== "#" + id) {
+        try { history.pushState(null, "", "#" + id); } catch (err) { /* file:// or sandboxed */ }
+      }
+      window.GolbertStage.go(key);
+      return;
+    }
     var target = id && document.getElementById(id);
     if (!target) return;
 
@@ -93,6 +118,8 @@
   // page loads) jump natively; with Lenis on, settle them below the nav too.
   if (lenis) {
     var settleOnHash = function (immediate) {
+      var key = stageKey(decodeURIComponent(window.location.hash.slice(1)));
+      if (key) { window.GolbertStage.go(key, immediate); return; }
       var target = targetFromHash(window.location.hash);
       if (!target || lenis.isStopped) return;
       // The browser has already jumped, but Lenis hasn't seen that scroll event yet:

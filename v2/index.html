@@ -12,8 +12,12 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://unpkg.com/lenis@1.3.26/dist/lenis.css">
 <link rel="stylesheet" href="css/style.css">
+<!-- Deferred, in order. main.js (end of body) runs first, so a slow CDN never blanks the page. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
 <script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js" defer></script>
 <script src="js/smooth-scroll.js" defer></script>
+<script src="js/stage.js" defer></script>
 </head>
 <body>
 
@@ -24,14 +28,7 @@
   <span class="intro-skip" aria-hidden="true">Click anywhere to skip</span>
 </button>
 
-<!-- Screen 2: who's watching -->
-<section class="screen profiles" id="profiles" hidden aria-labelledby="profiles-title">
-  <h1 class="profiles-title" id="profiles-title">Who's watching?</h1>
-  <ul class="profile-list" id="profile-list"></ul>
-  <p class="profiles-note">Every profile watches the same true story of Golbert Kamanzi — it only changes what plays first.</p>
-</section>
-
-<!-- Screen 3: browse -->
+<!-- Screen 2: browse -->
 <div class="screen browse" id="browse" hidden>
   <a class="skip-link" href="#rows">Skip to content</a>
   <div class="nav-sentinel" id="nav-sentinel" aria-hidden="true"></div>
@@ -40,32 +37,30 @@
     <div class="nav-left">
       <a class="logo" href="#top" aria-label="GOLBERT: The Series, home">GOLBERT<span class="logo-tag">SERIES</span></a>
       <nav aria-label="Sections">
-        <ul class="nav-links">
+        <ul class="nav-links" id="nav-links">
           <li><a href="#top">Home</a></li>
           <li><a href="#projects">Projects</a></li>
-          <li><a href="#journey">Journey</a></li>
           <li><a href="#certificates">Certificates</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
       </nav>
     </div>
-    <button type="button" class="switch" id="switch-profile" aria-label="Switch profile">
-      <span class="switch-name" id="switch-name"></span>
-      <span class="switch-chip" id="switch-chip" aria-hidden="true"></span>
-    </button>
   </header>
 
   <main>
-    <section class="hero" id="top" tabindex="-1" aria-labelledby="hero-title">
+   <!-- The series: with GSAP, html.staged turns this into a sticky stage where each section
+        is a scene. Without it (reduced motion, CDN failure) the sections simply stack. -->
+   <section class="series" id="series" aria-label="GOLBERT: The Series">
+    <div class="stage" id="stage">
+    <div class="stage-bg" id="stage-bg" aria-hidden="true"></div>
+    <div class="rings" id="rings" aria-hidden="true"></div>
+
+    <section class="hero scene" id="top" tabindex="-1" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="hero-kicker" id="hero-kicker"></p>
         <h1 class="hero-title" id="hero-title" tabindex="-1">GOLBERT</h1>
-        <p class="hero-sub">THE SERIES</p>
-        <ul class="hero-meta" id="hero-meta"></ul>
-        <p class="hero-genre">FULL-STACK DEVELOPER · CLOUD · IAM</p>
         <p class="hero-synopsis" id="hero-synopsis"></p>
         <div class="hero-actions">
-          <button type="button" class="btn btn-white" id="play-intro"><span aria-hidden="true">▶</span> Play intro</button>
           <a class="btn btn-grey" id="hero-resume" href="#" target="_blank" rel="noopener">View Résumé</a>
           <a class="btn-round" href="#contact" aria-label="More info: contact details"><span aria-hidden="true">i</span></a>
         </div>
@@ -74,12 +69,11 @@
     </section>
 
     <div id="rows" tabindex="-1"></div>
-  </main>
 
-  <footer class="footer" id="contact" tabindex="-1" aria-labelledby="footer-title">
+  <footer class="footer scene" id="contact" tabindex="-1" aria-labelledby="footer-title">
     <div class="footer-inner">
       <p class="kicker">THE NEXT SEASON</p>
-      <h2 class="footer-title" id="footer-title">To be continued...</h2>
+      <h2 class="footer-title" id="footer-title" tabindex="-1">To be continued...</h2>
       <p class="footer-copy">The next episode could be on your team. I'm open to internships and junior roles in full-stack, cloud and IT support.</p>
       <div class="footer-actions" id="footer-actions"></div>
       <div class="footer-bottom">
@@ -88,6 +82,15 @@
       </div>
     </div>
   </footer>
+
+    <div class="burst" id="burst" aria-hidden="true"></div>
+    <div class="card" id="card" aria-hidden="true"></div>
+    </div>
+   </section>
+  </main>
+
+  <div class="now" id="now" aria-hidden="true"><b id="now-ep">EP 00</b><span id="now-name">Home</span></div>
+  <div id="dialogs"></div>
 </div>
 
 <script src="js/main.js"></script>

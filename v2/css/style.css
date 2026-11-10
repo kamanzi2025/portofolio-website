@@ -226,6 +226,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .nav-links { display: flex; gap: 22px; font-size: 14px; }
 .nav-links a { text-decoration: none; color: var(--text-2); transition: color .2s; white-space: nowrap; }
 .nav-links a:hover { color: var(--text-4); }
+.nav-links a[aria-current="true"] { color: #fff; box-shadow: inset 0 -2px 0 var(--red); padding-bottom: 4px; }
 .switch {
   display: inline-flex; align-items: center; gap: 10px; flex: none;
   background: none; border: 0; cursor: pointer; padding: 4px;
@@ -391,9 +392,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .art-4 { background: linear-gradient(135deg, #9A6B12 0%, #2B1E06 100%); }
 .art-5 { background: linear-gradient(135deg, #6D28D9 0%, #1E0B3E 100%); }
 
-/* Full story */
-.story { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; }
-.card { background: var(--card-2); border: 1px solid var(--line-2); border-radius: var(--r-lg); padding: clamp(20px, 3vw, 36px); }
+/* Full story: résumé (now shown in the dialog) */
+.resume.card { background: var(--card-2); border: 1px solid var(--line-2); border-radius: var(--r-lg); padding: clamp(20px, 3vw, 36px); }
 .resume { display: grid; gap: 22px; }
 .resume-name { font: 400 clamp(36px, 4vw, 48px)/1 var(--display); letter-spacing: .02em; }
 .resume-headline { color: var(--text-2); font-weight: 600; margin-top: 4px; }
@@ -414,13 +414,6 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .skill-lines { display: grid; gap: 6px; font-size: 14px; color: var(--text-3); }
 .skill-lines b { color: var(--text-2); font-weight: 600; }
 
-.story-side { display: flex; flex-direction: column; gap: 22px; position: sticky; top: 96px; align-self: start; }
-.story-side h3 { font: 400 clamp(34px, 3.6vw, 44px)/1 var(--display); letter-spacing: .02em; }
-.story-side p { color: var(--text-3); }
-.story-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 8px; padding-top: 20px; border-top: 1px solid var(--line-2); }
-.stat b { display: block; font: 400 56px/1 var(--display); color: var(--red); text-shadow: var(--red-glow); }
-.stat span { font-size: 13px; color: var(--text-4); }
 
 /* Top moments */
 .award {
@@ -430,6 +423,12 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   border: 1px solid var(--gold-line);
 }
 .award:hover, .award:focus-visible { border-color: var(--gold); }
+.award { overflow: hidden; }
+.shine {
+  position: absolute; top: -20%; bottom: -20%; left: 0; width: 55%; pointer-events: none;
+  background: linear-gradient(105deg, transparent 15%, rgba(232, 195, 90, .3) 50%, transparent 85%);
+  transform: translateX(-130%);
+}
 .award svg { width: 30px; height: 30px; color: var(--gold); }
 .award-kind { font: 700 11px/1 var(--body); letter-spacing: .2em; color: var(--gold-2); }
 .award-title { font: 700 18px/1.25 var(--body); color: var(--text); }
@@ -649,6 +648,89 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   font-size: 13px; color: var(--muted);
 }
 
+/* ---------- The Full Story: Episode card + fact chips ---------- */
+.story-stage {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 460px) minmax(0, 1fr);
+  align-items: center; gap: 16px 28px;
+}
+.story-chips { display: grid; gap: 14px; }
+.story-chips-a { justify-items: end; }
+.story-chips-b { justify-items: start; }
+.story-chip {
+  max-width: 270px; padding: 13px 15px; border-radius: 10px;
+  background: rgba(20, 20, 24, .92); border: 1px solid var(--line-2);
+  font-size: 13px; line-height: 1.45; color: var(--text-3);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .45);
+}
+.story-chip b { display: block; font: 700 10px/1 var(--body); letter-spacing: .2em; color: var(--red); margin-bottom: 5px; }
+.story-chip strong { color: var(--text); font-weight: 600; }
+.story-card {
+  position: relative; z-index: 1;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .6);
+}
+.story-card-art {
+  min-height: 190px; padding: 24px 24px 20px;
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 4px;
+  background: linear-gradient(160deg, #B20710 0%, #3A0D16 55%, #141418 100%);
+}
+.story-card-title { font: 400 clamp(44px, 4.4vw, 60px)/.9 var(--display); letter-spacing: .02em; color: #fff; }
+.story-card-name { font-weight: 600; color: #fff; margin-top: 8px; }
+.story-card-headline { font-size: 14px; color: rgba(255, 255, 255, .85); }
+.story-card-body { padding: 16px 22px 22px; display: grid; gap: 14px; }
+.story-card-contact { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.story-card-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.story-card-actions .btn { min-height: 40px; padding: 0 14px; font-size: 14px; }
+
+/* Full résumé dialog */
+.resume-dialog {
+  width: min(760px, calc(100vw - 32px)); max-height: min(86vh, 900px);
+  padding: 0; border: 1px solid var(--line-2); border-radius: 14px;
+  background: var(--bg); color: var(--text);
+}
+.resume-dialog::backdrop { background: rgba(0, 0, 0, .72); }
+.resume-dialog-inner { max-height: min(86vh, 900px); overflow-y: auto; padding-bottom: 20px; overscroll-behavior: contain; }
+.resume-dialog-head {
+  position: sticky; top: 0; z-index: 2;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 20px; background: var(--bg); border-bottom: 1px solid var(--line-2);
+}
+.resume-dialog-head h2 { font: 400 30px/1 var(--display); letter-spacing: .02em; }
+.resume-dialog-head h2 span { color: var(--muted); }
+.resume-dialog-close {
+  width: 40px; height: 40px; flex: none; border-radius: 50%; cursor: pointer;
+  border: 1px solid #4A4A52; background: transparent; color: var(--text); font-size: 24px; line-height: 1;
+}
+.resume-dialog-close:hover { border-color: var(--text); }
+.resume-dialog .resume { margin: 8px 20px 0; padding: 12px 0 0; border: 0; background: none; }
+.resume-dialog-foot { padding: 18px 20px 0; }
+
+/* Certificates: one grid of all 24 */
+.cert-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.cert-grid > li { min-width: 0; }
+.cert-grid .cert { width: auto; height: 100%; min-height: 0; padding: 14px; gap: 6px; }
+.cert-grid .cert-title { font-size: 14px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.cert-grid .cert-foot { font-size: 12px; }
+.cert > * { transition: opacity .25s; }
+.cert.is-dim > * { opacity: .25; }
+
+/* Journey: the season tabs sit on a timeline rail */
+.season-rail { position: relative; margin-bottom: 22px; }
+.rail-line {
+  position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px;
+  background: linear-gradient(90deg, #7F1D1D, var(--red));
+  transform-origin: var(--o, 0%) 50%; transform: scaleX(var(--p, 1));
+}
+.season-rail .season-tabs { position: relative; gap: 18px; margin: 0; }
+.season-tab { background: var(--bg); display: inline-flex; align-items: center; gap: 9px; }
+.rail-dot {
+  width: 11px; height: 11px; border-radius: 50%; flex: none;
+  background: var(--bg); border: 2.5px solid var(--red); box-shadow: 0 0 12px rgba(229, 9, 20, .6);
+}
+
+/* Stage-only layers and the episode indicator (hidden in the stacked layout) */
+.stage-bg, .rings, .burst, .card, .now { display: none; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 960px) {
   .nav { flex-wrap: wrap; row-gap: 8px; padding-top: 14px; padding-bottom: 12px; }
@@ -663,8 +745,6 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   .hero-photo::after { height: 55%; }
   .hero-photo .photo-fallback { min-height: 0; }
 
-  .story { grid-template-columns: minmax(0, 1fr); }
-  .story-side { position: static; }
   .skills { grid-template-columns: minmax(0, 1fr); }
   .genre-tabs {
     flex-direction: row; overflow-x: auto; scrollbar-width: none;
@@ -677,6 +757,12 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   }
   .genre-tab[aria-selected="true"] { border-bottom-color: var(--red); }
   .skill-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .story-stage { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "card card" "a b"; gap: 12px; }
+  .story-card { grid-area: card; justify-self: center; width: min(100%, 520px); }
+  .story-chips-a { grid-area: a; justify-items: stretch; }
+  .story-chips-b { grid-area: b; justify-items: stretch; }
+  .story-chip { max-width: none; }
 }
 
 @media (max-width: 560px) {
@@ -718,8 +804,17 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   .pick-title { font-size: 21px; }
 
   .skill-grid { grid-template-columns: minmax(0, 1fr); }
-  .stats { gap: 8px; }
-  .stat b { font-size: 44px; }
+  .story-chips { gap: 8px; }
+  .story-chip { padding: 9px 10px; font-size: 11.5px; line-height: 1.4; }
+  .story-chip b { font-size: 9px; margin-bottom: 3px; }
+  .story-card-art { min-height: 0; padding: 16px 16px 14px; }
+  .story-card-title { font-size: 40px; }
+  .story-card-body { padding: 12px 14px 14px; gap: 10px; }
+  .story-card-actions .btn { min-height: 36px; padding: 0 11px; font-size: 13px; }
+  .cert-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .season-rail .season-tabs { flex-wrap: nowrap; gap: 4px; }
+  .season-tab { flex: 1 1 0; min-width: 0; justify-content: center; padding: 0 6px; font-size: 11.5px; gap: 4px; white-space: nowrap; }
+  .rail-dot { width: 8px; height: 8px; border-width: 2px; }
   .edu-row { grid-template-columns: minmax(0, 1fr); }
 
   .ep { grid-template-columns: 34px minmax(0, 1fr); gap: 6px 14px; padding: 16px 4px; }
@@ -737,8 +832,124 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
     animation-delay: 0s !important;
     transition-duration: .01ms !important;
   }
-  .reveal > * { opacity: 1; transform: none; }
+  .reveal > * { transform: none; transition: opacity .5s linear !important; } /* a plain fade, no movement */
   .tile:hover, .tile:focus-visible,
   .pick:hover .pick-poster, .pick:focus-visible .pick-poster,
   .profile:hover .profile-avatar, .profile:focus-visible .profile-avatar { transform: none; }
 }
+
+/* =====================================================================
+   STAGED MODE (js/stage.js adds html.staged when GSAP is running)
+   The viewport is a sticky stage; every section is a full-screen scene.
+   ===================================================================== */
+:root { --scene-top: 92px; --scene-bottom: 60px; }
+@media (max-width: 960px) { :root { --scene-top: 106px; --scene-bottom: 54px; } }
+
+html.staged .series { position: relative; }
+html.staged .stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: var(--bg); }
+html.staged #rows { position: static; margin: 0; }
+html.staged .scene {
+  position: absolute; inset: 0; z-index: 2; margin: 0;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: var(--scene-top) 0 var(--scene-bottom);
+}
+html.staged .reveal > * { opacity: 1; transform: none; transition: none; }
+/* GSAP drives these transforms every frame; a CSS transition on the same property makes them lag and jitter */
+html.staged .pick-poster { transition: none; }
+/* keep the big animated layers on the GPU so their shadows aren't repainted every frame */
+html.staged .rings-inner, html.staged .ring, html.staged .burst { will-change: transform, opacity; }
+html.staged .block-head { margin-bottom: 14px; }
+
+/* stage layers */
+html.staged .stage-bg {
+  display: block; position: absolute; inset: 0; z-index: 0;
+  background: radial-gradient(ellipse 60% 70% at 78% 45%, rgba(229, 9, 20, .22) 0%, rgba(58, 13, 22, .55) 35%, rgba(11, 11, 15, 0) 72%);
+}
+@media (max-width: 960px) {
+  html.staged .stage-bg { background: radial-gradient(ellipse 90% 45% at 50% 28%, rgba(229, 9, 20, .2) 0%, rgba(58, 13, 22, .5) 40%, rgba(11, 11, 15, 0) 75%); }
+}
+html.staged .rings { display: block; position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 1; }
+.rings-inner { position: absolute; left: 0; top: 0; animation: breathe 4s ease-in-out infinite; }
+.ring {
+  position: absolute; left: 0; top: 0; border-radius: 50%; visibility: hidden;
+  border: 1.5px solid rgba(229, 9, 20, .32);
+  box-shadow: inset 0 0 40px rgba(229, 9, 20, .08), 0 0 30px rgba(229, 9, 20, .05);
+}
+@keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.035); } }
+html.staged .burst {
+  display: block; position: absolute; left: 50%; top: 50%; z-index: 8;
+  width: 20px; height: 20px; margin: -10px 0 0 -10px; border-radius: 50%; visibility: hidden;
+  background: radial-gradient(circle, #E50914 0%, #9E0710 60%, #3A0D16 100%);
+}
+
+/* the travelling card (the hero photo card) */
+html.staged .card {
+  display: block; position: absolute; left: 0; top: 0; z-index: 6;
+  border-radius: var(--r-lg); overflow: hidden; background: var(--card);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .6), 0 0 0 1px rgba(255, 255, 255, .06);
+  will-change: transform; contain: layout paint;
+}
+.card .card-layer { position: absolute; inset: 0; width: auto !important; height: auto !important; margin: 0; border: 0; border-radius: 0; box-shadow: none; }
+.card-photo .photo-fallback { min-height: 0; height: 100%; border-radius: 0; }
+.card-photo img { width: 100%; height: 100%; max-height: none; object-fit: cover; object-position: center top; }
+.card-photo::after { content: ""; position: absolute; inset: auto 0 0 0; height: 35%; background: linear-gradient(to top, rgba(11, 11, 15, .8), rgba(11, 11, 15, 0)); }
+.card-layer.episode { background: var(--card); }
+.card-layer.episode .episode-art { height: calc(100% - 4px); }
+.card-layer.story-card { display: flex; flex-direction: column; }
+.card-layer.story-card .story-card-art { flex: 1; }
+
+/* hero: the card stands in for the photo */
+html.staged .scene.hero { display: grid; align-content: center; min-height: 0; padding: var(--scene-top) var(--gutter) 32px; background: transparent; overflow: visible; }
+html.staged .hero-photo { height: min(560px, calc(100svh - var(--scene-top) - 70px)); }
+html.staged .hero-photo > * { opacity: 0; }
+
+/* finale */
+html.staged .scene.footer { padding: var(--scene-top) var(--gutter) 22px; justify-content: center; }
+html.staged .footer-bottom { margin-top: 48px; }
+
+/* episode indicator */
+html.staged .now {
+  display: flex; align-items: center; gap: 10px; pointer-events: none;
+  position: fixed; left: var(--gutter); bottom: 18px; z-index: 20;
+  font-size: 12px; color: var(--text-3);
+}
+.now b { padding: 3px 7px; border-radius: 4px; background: var(--red); color: #fff; font-size: 10px; letter-spacing: .12em; }
+
+/* scenes that have to fit one screen */
+html.staged #moments .row-track { perspective: 1200px; }
+html.staged .cert-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+html.staged .cert-grid .cert { padding: 12px; min-height: 96px; }
+html.staged .cert-grid .cert-title { font-size: 13px; -webkit-line-clamp: 2; }
+html.staged .season-panel { overflow-y: auto; max-height: calc(100svh - var(--scene-top) - var(--scene-bottom) - 190px); padding-right: 6px; }
+html.staged .season-panel[data-lenis-prevent] { overscroll-behavior: auto; } /* at its end, the wheel carries on to the page */
+html.staged .ep { padding: 12px 14px; }
+html.staged .ep-thumb { height: 64px; }
+
+@media (max-width: 960px) {
+  html.staged .scene.hero { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  html.staged .hero-photo { height: 28svh; max-width: 420px; margin-bottom: 0; }
+  html.staged .cert-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  html.staged .skill-grid { max-height: calc(100svh - var(--scene-top) - var(--scene-bottom) - 150px); overflow-y: auto; }
+}
+@media (max-width: 560px) {
+  html.staged .hero-photo { height: 23svh; }
+  html.staged .hero-title { font-size: clamp(72px, 22vw, 110px); }
+  html.staged .hero-copy { gap: 10px; }
+  html.staged .hero-meta { margin-top: 6px; }
+  html.staged .hero-synopsis { font-size: 14px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  html.staged .hero-actions { margin-top: 4px; }
+  html.staged .hero-actions .btn { min-height: 44px; }
+  html.staged .cert-grid { gap: 6px; }
+  html.staged .cert-grid .cert { padding: 7px; min-height: 70px; gap: 3px; }
+  html.staged .cert-grid .cert-issuer { font-size: 7.5px; letter-spacing: .08em; }
+  html.staged .cert-grid .cert-title { font-size: 10px; line-height: 1.25; -webkit-line-clamp: 4; }
+  html.staged .cert-grid .cert-foot, html.staged .cert-grid .cert-arrow { display: none; }
+  html.staged .cert-filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-bottom: 12px; }
+  html.staged .cert-filters::-webkit-scrollbar { display: none; }
+  html.staged .cert-filters .chip { flex: none; min-height: 32px; }
+  html.staged .footer-title { font-size: 64px; }
+  html.staged .footer-bottom { margin-top: 32px; }
+  html.staged .now { bottom: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .rings-inner { animation: none; } }
+

@@ -40,30 +40,27 @@ var SITE = {
       ["Core concepts", "Algorithms, data structures, problem solving"]
     ],
     languages: "Kinyarwanda (native) · English (professional) · French (conversational)",
+    // Fact chips around the Episode card in The Full Story (credentials are added from the cert list)
+    storyChips: [
+      ["EDUCATION", "African Leadership University", "BSc Software Engineering · Sep 2024 – Present"],
+      ["HIGH SCHOOL", "Nu-Vision High School", "Maths, Economics & Computer Science · 2018 – 2021"],
+      ["LEADERSHIP", "Club President", "Annual outreach for less fortunate communities"],
+      ["STACK", "", "Python (FastAPI) · React · TypeScript · Next.js · Flutter · Azure · AWS IAM"],
+      ["LANGUAGES", "", "Kinyarwanda · English · French"]
+    ],
     languageCount: 3
   },
 
   profiles: [
-    { id: "golbert", name: "Golbert", glyph: "G", grad: "grad-red", badge: "MAIN",
-      hint: "The full series, in order", kicker: "A GOLBERT ORIGINAL SERIES",
-      order: ["continue", "story", "moments", "certs", "skills", "originals", "journey", "picks"] },
-    { id: "recruiter", name: "Recruiter", glyph: "R", grad: "grad-blue",
-      hint: "Résumé, achievements & skills first", kicker: "RECRUITER'S CUT · RÉSUMÉ FIRST",
-      order: ["continue", "story", "certs", "moments", "skills", "picks", "originals", "journey"] },
-    { id: "developer", name: "Developer", glyph: "</>", glyphClass: "is-code", grad: "grad-green",
-      hint: "Projects, stack & certificates first", kicker: "DEVELOPER'S CUT · CODE FIRST",
-      order: ["continue", "originals", "skills", "certs", "journey", "story", "moments", "picks"] },
-    { id: "creative", name: "Creative", glyph: "✦", glyphClass: "is-star", grad: "grad-amber",
-      hint: "The story as a highlight reel", kicker: "THE HIGHLIGHT REEL",
-      order: ["continue", "picks", "journey", "moments", "originals", "skills", "certs", "story"] }
+    { id: "developer", name: "Developer", kicker: "DEVELOPER'S CUT · CODE FIRST",
+      order: ["continue", "originals", "skills", "certs", "picks"] }
   ],
 
   episodes: [
-    { n: "01", title: "The Full Story", sub: "Résumé · education & leadership", progress: 100, href: "#story" },
-    { n: "02", title: "My Projects", sub: "What I have built", progress: 60, href: "#projects" },
-    { n: "03", title: "My Journey", sub: "Four seasons, 2018 – now", progress: 80, href: "#journey" },
-    { n: "04", title: "Certificates", sub: "24 verified credentials", progress: 100, href: "#certificates" },
-    { n: "05", title: "Contact", sub: "The next episode", progress: 20, href: "#contact" }
+    // key: the scene it plays. Tiles show in the profile's order, numbered by episode.
+    { key: "originals", title: "My Projects", sub: "What I have built", progress: 60, href: "#projects", art: 2 },
+    { key: "certs", title: "Certificates", sub: "24 verified credentials", progress: 100, href: "#certificates", art: 4 },
+    { key: "finale", title: "Contact", sub: "The next episode", progress: 20, href: "#contact", art: 5 }
   ],
 
   // Certificate groups, as on the résumé. All certificates are issued through Coursera.
@@ -229,9 +226,9 @@ var SITE = {
   picks: [
     { title: "Google IT Support", cert: "google-it", color: "poster-blue" },
     { title: "Microsoft IT Support", cert: "ms-it", color: "poster-green" },
-    { title: "AWS: IAM", cert: "wl-aws-iam", color: "poster-orange" },
-    { title: "Azure Active Directory", cert: "ms-azure-ad", color: "poster-purple" },
-    { title: "APIs (Meta)", cert: "meta-apis", color: "poster-blue" }
+    { title: "IBM Software Engineering", cert: "ibm-se", color: "poster-purple" },
+    { title: "CaféCampus", project: "CaféCampus", color: "poster-orange" },
+    { title: "AutoParts Store Manager", project: "AutoParts Store Manager", color: "poster-blue" }
   ]
 };
 
@@ -241,7 +238,6 @@ var SITE = {
   "use strict";
 
   var KEY_INTRO = "golbert.introSeen";
-  var KEY_PROFILE = "golbert.profile";
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function store(key, value) {
@@ -268,7 +264,7 @@ var SITE = {
 
   function head(title, kicker, gold) {
     return '<div class="block-head">' +
-      '<h2 class="block-title">' + title + "</h2>" +
+      '<h2 class="block-title" tabindex="-1">' + title + "</h2>" +
       (kicker ? '<p class="kicker' + (gold ? " gold" : "") + '">' + esc(kicker) + "</p>" : "") +
       "</div>";
   }
@@ -281,12 +277,18 @@ var SITE = {
   }
   function li(inner, cls) { return '<li class="' + (cls || "") + '">' + inner + "</li>"; }
 
+  function epOf(profile, key) {
+    var n = key === "finale" ? profile.order.length + 1 : profile.order.indexOf(key) + 1;
+    return n < 10 ? "0" + n : String(n);
+  }
+
   var SECTIONS = {
-    "continue": function () {
-      var items = SITE.episodes.map(function (e, i) {
+    "continue": function (profile) {
+      var eps = SITE.episodes.slice().sort(function (a, b) { return epOf(profile, a.key) - epOf(profile, b.key); });
+      var items = eps.map(function (e) {
         return li('<a class="tile episode" href="' + e.href + '">' +
-          '<div class="episode-art art-' + (i % 5 + 1) + '">' +
-            '<span class="episode-num">EPISODE ' + e.n + "</span>" +
+          '<div class="episode-art art-' + e.art + '">' +
+            '<span class="episode-num">EPISODE ' + epOf(profile, e.key) + "</span>" +
             '<span class="episode-title">' + esc(e.title) + "</span>" +
             '<span class="episode-sub">' + esc(e.sub) + "</span>" +
           "</div>" +
@@ -296,7 +298,7 @@ var SITE = {
       return { id: "continue", html: head("Continue Exploring") + row("Episodes", items) };
     },
 
-    story: function () {
+    story: function (profile) {
       var p = SITE.person;
       var edu = p.education.map(function (e) {
         return '<div class="edu-row"><strong>' + esc(e.school) + '</strong><span class="when">' + esc(e.when) + "</span><p>" + esc(e.detail) + "</p></div>";
@@ -307,43 +309,65 @@ var SITE = {
         var list = SITE.certs.filter(function (c) { return c.group === g.id; });
         return "<li><b>" + esc(g.name) + " (" + list.length + "):</b> " + list.map(function (c) { return esc(c.title) + " – " + esc(c.issuer); }).join("; ") + "</li>";
       }).join("");
+      var chips = p.storyChips.concat([["CREDENTIALS", SITE.certs.length + " certificates", profCount + " professional · " + p.languageCount + " languages"]]).map(function (c) {
+        return '<li class="story-chip"><b>' + esc(c[0]) + "</b>" + (c[1] ? "<strong>" + esc(c[1]) + "</strong> " : "") + "<span>" + esc(c[2]) + "</span></li>";
+      });
+      var resume =
+        '<article class="card resume" aria-label="Résumé">' +
+          "<header>" +
+            '<h3 class="resume-name">' + esc(p.fullName) + "</h3>" +
+            '<p class="resume-headline">' + esc(p.headline) + "</p>" +
+            '<p class="resume-contact">' + esc(p.city) + ' · <a href="' + p.phoneHref + '">' + esc(p.phone) + '</a> · <a href="mailto:' + p.email + '">' + esc(p.email) + "</a></p>" +
+          "</header>" +
+          '<p class="resume-summary">' + esc(p.summary) + "</p>" +
+          "<section><h4>EDUCATION</h4><div class=\"edu\">" + edu + "</div></section>" +
+          '<section><h4>LEADERSHIP</h4><p class="resume-summary">' + esc(p.leadership) + "</p></section>" +
+          '<section><h4>TECHNICAL SKILLS</h4><ul class="skill-lines">' + skills + "</ul></section>" +
+          '<section><h4>CERTIFICATIONS</h4><ul class="skill-lines">' + certGroupLines + '</ul><p class="resume-note">All ' + SITE.certs.length + ' verified through ' + esc(SITE.certPlatform) + '. <a href="#certificates">See every certificate</a></p></section>' +
+          '<section><h4>LANGUAGES</h4><p class="resume-summary">' + esc(p.languages) + "</p></section>" +
+          '<section><h4>SOFT SKILLS</h4><ul class="soft-list">' + p.softSkills.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></section>" +
+        "</article>";
       var html = head("The Full Story", "— THE SCREENPLAY") +
-        '<div class="block-body story">' +
-          '<article class="card resume" aria-label="Résumé">' +
-            "<header>" +
-              '<h3 class="resume-name">' + esc(p.fullName) + "</h3>" +
-              '<p class="resume-headline">' + esc(p.headline) + "</p>" +
-              '<p class="resume-contact">' + esc(p.city) + ' · <a href="' + p.phoneHref + '">' + esc(p.phone) + '</a> · <a href="mailto:' + p.email + '">' + esc(p.email) + "</a></p>" +
-            "</header>" +
-            '<p class="resume-summary">' + esc(p.summary) + "</p>" +
-            "<section><h4>EDUCATION</h4><div class=\"edu\">" + edu + "</div></section>" +
-            '<section><h4>LEADERSHIP</h4><p class="resume-summary">' + esc(p.leadership) + "</p></section>" +
-            '<section><h4>TECHNICAL SKILLS</h4><ul class="skill-lines">' + skills + "</ul></section>" +
-            '<section><h4>CERTIFICATIONS</h4><ul class="skill-lines">' + certGroupLines + '</ul><p class="resume-note">All ' + SITE.certs.length + ' verified through ' + esc(SITE.certPlatform) + '. <a href="#certificates">See every certificate</a></p></section>' +
-            '<section><h4>LANGUAGES</h4><p class="resume-summary">' + esc(p.languages) + "</p></section>" +
-            '<section><h4>SOFT SKILLS</h4><ul class="soft-list">' + p.softSkills.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></section>" +
+        '<div class="block-body story-stage">' +
+          '<ul class="story-chips story-chips-a">' + chips.slice(0, 3).join("") + "</ul>" +
+          '<article class="story-card" aria-labelledby="story-card-title">' +
+            '<div class="story-card-art art-1">' +
+              '<span class="episode-num">EPISODE ' + epOf(profile, "story") + "</span>" +
+              '<h3 class="story-card-title" id="story-card-title">The Full Story</h3>' +
+              '<p class="story-card-name">' + esc(p.fullName) + "</p>" +
+              '<p class="story-card-headline">' + esc(p.headline) + "</p>" +
+            "</div>" +
+            '<div class="progress" aria-hidden="true"><span style="width:100%"></span></div>' +
+            '<div class="story-card-body">' +
+              '<p class="story-card-contact">' + esc(p.city) + " · " + esc(p.email) + "</p>" +
+              '<div class="story-card-actions">' +
+                '<button type="button" class="btn btn-white" data-open-resume aria-haspopup="dialog">Read full résumé</button>' +
+                '<a class="btn btn-red" href="' + esc(p.resume) + '" target="_blank" rel="noopener">Download Résumé (PDF)</a>' +
+                '<a class="btn btn-grey" href="#contact">Contact me</a>' +
+              "</div>" +
+            "</div>" +
           "</article>" +
-          '<aside class="card story-side">' +
-            "<h3>Every episode, one page.</h3>" +
-            "<p>Education, leadership, skills and certificates on a single printable page.</p>" +
-            '<div class="story-actions">' +
-              '<a class="btn btn-red" href="' + esc(p.resume) + '" target="_blank" rel="noopener">Download Résumé (PDF)</a>' +
-              '<a class="btn btn-grey" href="#contact">Contact me</a>' +
-            "</div>" +
-            '<div class="stats">' +
-              '<div class="stat"><b>' + SITE.certs.length + "</b><span>Certificates</span></div>" +
-              '<div class="stat"><b>' + profCount + "</b><span>Professional</span></div>" +
-              '<div class="stat"><b>' + p.languageCount + "</b><span>Languages</span></div>" +
-            "</div>" +
-          "</aside>" +
+          '<ul class="story-chips story-chips-b">' + chips.slice(3).join("") + "</ul>" +
         "</div>";
-      return { id: "story", html: html };
+      var dialog =
+        '<dialog class="resume-dialog" id="resume-dialog" aria-labelledby="resume-dialog-title">' +
+          '<div class="resume-dialog-inner" data-lenis-prevent>' +
+            '<div class="resume-dialog-head">' +
+              '<h2 id="resume-dialog-title">The Full Story <span>· Résumé</span></h2>' +
+              '<button type="button" class="resume-dialog-close" data-close-resume aria-label="Close résumé">×</button>' +
+            "</div>" +
+            resume +
+            '<div class="resume-dialog-foot"><a class="btn btn-red" href="' + esc(p.resume) + '" target="_blank" rel="noopener">Download Résumé (PDF)</a></div>' +
+          "</div>" +
+        "</dialog>";
+      return { id: "story", html: html, dialog: dialog };
     },
 
     moments: function () {
       var items = SITE.moments.map(function (m) {
         var href = m.cert ? certById(m.cert).url : m.href;
         return li('<a class="tile award" href="' + esc(href) + '"' + ext(href) + ">" +
+          '<span class="shine" aria-hidden="true"></span>' +
           TROPHY +
           '<span class="award-kind">' + esc(m.kind) + "</span>" +
           '<span class="award-title">' + esc(m.title) + "</span>" +
@@ -358,16 +382,16 @@ var SITE = {
         var n = g.id === "all" ? SITE.certs.length : SITE.certs.filter(function (c) { return c.group === g.id; }).length;
         return '<button type="button" class="chip" data-group="' + g.id + '" aria-pressed="' + (i === 0) + '">' + esc(g.name) + " <span>" + n + "</span></button>";
       }).join("");
-      var html = head("Certified · " + SITE.certs.length + " credentials") +
-        '<div class="block-body cert-filters" role="group" aria-label="Filter certificates by group">' + chips + "</div>" +
-        row("Certificates", certItems("all"));
+      var html = head('Certified · <span class="count">' + SITE.certs.length + "</span> credentials") +
+        '<div class="block-body cert-filters" role="group" aria-label="Highlight certificates by group">' + chips + "</div>" +
+        '<div class="block-body"><ul class="cert-grid" aria-label="Certificates">' + certItems() + "</ul></div>";
       return { id: "certificates", html: html, init: initCerts };
     }
   };
 
-  function certItems(group) {
-      return SITE.certs.filter(function (c) { return group === "all" || c.group === group; }).map(function (c) {
-        return li('<a class="tile cert" href="' + esc(c.url) + '" target="_blank" rel="noopener" aria-label="' + esc(c.title + ", " + c.issuer + ", " + c.date + ". Verify (opens in a new tab)") + '">' +
+  function certItems() {
+      return SITE.certs.map(function (c) {
+        return li('<a class="tile cert" data-group="' + c.group + '" href="' + esc(c.url) + '" target="_blank" rel="noopener" aria-label="' + esc(c.title + ", " + c.issuer + ", " + c.date + ". Verify (opens in a new tab)") + '">' +
           '<span class="cert-top"><span class="cert-issuer">' + esc(c.issuer) + '</span><span class="cert-arrow" aria-hidden="true">↗</span></span>' +
           '<span class="cert-title">' + esc(c.title) + "</span>" +
           '<span class="cert-foot">' + esc(c.date) + " · " + esc(SITE.certPlatform) + " · <span>Verify</span></span>" +
@@ -375,15 +399,15 @@ var SITE = {
       }).join("");
   }
 
+  // The grid always holds all 24 (the stage animates them); a filter dims the others.
   function initCerts(section) {
-    var track = $(".row-track", section);
     var chips = $all(".chip", section);
+    var tiles = $all(".cert", section);
     chips.forEach(function (chip) {
       chip.addEventListener("click", function () {
+        var g = chip.getAttribute("data-group");
         chips.forEach(function (c) { c.setAttribute("aria-pressed", c === chip); });
-        track.innerHTML = certItems(chip.getAttribute("data-group"));
-        track.scrollLeft = 0;
-        if (track._watchEnds) track._watchEnds();
+        tiles.forEach(function (t) { t.classList.toggle("is-dim", g !== "all" && t.getAttribute("data-group") !== g); });
       });
     });
   }
@@ -434,28 +458,37 @@ var SITE = {
     journey: function () {
       var tabs = SITE.seasons.map(function (s) {
         var on = s.n === SITE.defaultSeason;
-        return '<button type="button" class="season-tab" role="tab" id="season-tab-' + s.n + '" aria-controls="season-panel" aria-selected="' + on + '" tabindex="' + (on ? 0 : -1) + '" data-season="' + s.n + '">Season ' + s.n + "</button>";
+        return '<button type="button" class="season-tab" role="tab" id="season-tab-' + s.n + '" aria-controls="season-panel" aria-selected="' + on + '" tabindex="' + (on ? 0 : -1) + '" data-season="' + s.n + '"><span class="rail-dot" aria-hidden="true"></span>Season ' + s.n + "</button>";
       }).join("");
       var html = head("My Journey", "— " + SITE.seasons.length + " SEASONS") +
         '<div class="block-body">' +
-          '<div class="season-tabs" role="tablist" aria-label="Seasons">' + tabs + "</div>" +
-          '<div id="season-panel" role="tabpanel" tabindex="0" aria-labelledby="season-tab-' + SITE.defaultSeason + '"></div>' +
+          '<div class="season-rail"><span class="rail-line" aria-hidden="true"></span>' +
+            '<div class="season-tabs" role="tablist" aria-label="Seasons">' + tabs + "</div>" +
+          "</div>" +
+          '<div class="season-panel" id="season-panel" role="tabpanel" tabindex="0" data-lenis-prevent aria-labelledby="season-tab-' + SITE.defaultSeason + '"></div>' +
         "</div>";
       return { id: "journey", html: html, init: initJourney };
     },
 
     picks: function () {
       var items = SITE.picks.map(function (p, i) {
-        var c = certById(p.cert);
+        var c;
+        if (p.project) {
+          var pr = SITE.projects.filter(function (x) { return x.title === p.project; })[0];
+          c = { title: pr.title, issuer: pr.type, url: pr.live || pr.code, badge: "PROJECT" };
+        } else {
+          c = certById(p.cert);
+          c = { title: c.title, issuer: c.issuer, url: c.url, badge: "CERT" };
+        }
         return li('<a class="pick" href="' + esc(c.url) + '" target="_blank" rel="noopener" aria-label="' + esc("Number " + (i + 1) + ": " + c.title + ", " + c.issuer + ". Opens in a new tab") + '">' +
           '<span class="pick-num" aria-hidden="true">' + (i + 1) + "</span>" +
           '<span class="pick-poster ' + p.color + '">' +
-            '<span class="poster-badge"><b>G</b>PICK</span>' +
+            '<span class="poster-badge"><b>G</b>' + c.badge + '</span>' +
             '<span><span class="pick-title">' + esc(p.title) + '</span><span class="pick-issuer">' + esc(c.issuer) + "</span></span>" +
           "</span>" +
           "</a>");
       }).join("");
-      return { id: "picks", html: head("Golbert's Top Picks") + row("Top picks", items) };
+      return { id: "picks", html: head("Highlights") + row("Highlights", items) };
     }
   };
 
@@ -560,7 +593,7 @@ var SITE = {
 
   var observer = null;
   function reveal(el) {
-    if (reduceMotion || !("IntersectionObserver" in window)) { el.classList.add("is-in"); return; }
+    if (!("IntersectionObserver" in window)) { el.classList.add("is-in"); return; }
     if (!observer) {
       observer = new IntersectionObserver(function (entries) {
         entries.forEach(function (en) {
@@ -577,13 +610,6 @@ var SITE = {
   function renderStatic() {
     var p = SITE.person;
 
-    $("#hero-meta").innerHTML = [
-      '<span class="meta-badge">ALU</span>',
-      '<span class="meta-hi">2024 – Present</span>',
-      "BSc Software Engineering",
-      SITE.certs.length + " Certificates",
-      p.languageCount + " Languages"
-    ].map(function (x) { return "<li>" + x + "</li>"; }).join("");
     $("#hero-synopsis").textContent = p.synopsis;
     $("#hero-resume").href = p.resume;
 
@@ -599,38 +625,32 @@ var SITE = {
       '<a class="btn btn-grey" href="' + esc(p.linkedin) + '" target="_blank" rel="noopener">LinkedIn</a>';
     $("#footer-contact").innerHTML = '<a href="' + p.phoneHref + '" style="color:inherit;text-decoration:none">' + esc(p.phone) + "</a> · " + esc(p.city);
 
-    $("#profile-list").innerHTML = SITE.profiles.map(function (pr) {
-      return "<li>" +
-        '<button type="button" class="profile" data-profile="' + pr.id + '" aria-label="' + esc(pr.name + ": " + pr.hint) + '">' +
-          '<span class="profile-avatar ' + pr.grad + " " + (pr.glyphClass || "") + '" aria-hidden="true">' + esc(pr.glyph) +
-            (pr.badge ? '<span class="badge-main">' + esc(pr.badge) + "</span>" : "") + "</span>" +
-          '<span class="profile-name" aria-hidden="true">' + esc(pr.name) + "</span>" +
-          '<span class="profile-hint" aria-hidden="true">' + esc(pr.hint) + "</span>" +
-        "</button></li>";
-    }).join("");
-    $all(".profile").forEach(function (b) {
-      b.addEventListener("click", function () { chooseProfile(b.getAttribute("data-profile")); });
-    });
-  }
-
-  function profileById(id) {
-    return SITE.profiles.filter(function (p) { return p.id === id; })[0] || SITE.profiles[0];
   }
 
   function renderBrowse(profile) {
     $("#hero-kicker").textContent = profile.kicker;
-    $("#switch-name").textContent = profile.name;
-    var chip = $("#switch-chip");
-    chip.className = "switch-chip " + profile.grad + " " + (profile.glyphClass || "");
-    chip.textContent = profile.glyph;
-    $("#switch-profile").setAttribute("aria-label", "Switch profile (watching as " + profile.name + ")");
+
+    document.body.setAttribute("data-profile", profile.id);
+
+    // Nav: Home, then Projects / Certificates in this profile's order, then Contact
+    var NAV = { originals: ["#projects", "Projects"], certs: ["#certificates", "Certificates"] };
+    var links = [["#top", "Home", "hero"]];
+    profile.order.forEach(function (k) { if (NAV[k]) links.push([NAV[k][0], NAV[k][1], k]); });
+    links.push(["#contact", "Contact", "finale"]);
+    $("#nav-links").innerHTML = links.map(function (l) {
+      return '<li><a href="' + l[0] + '" data-scene="' + l[2] + '">' + l[1] + "</a></li>";
+    }).join("");
+
+    var dialogs = $("#dialogs");
+    dialogs.innerHTML = "";
 
     var root = $("#rows");
     root.innerHTML = "";
     profile.order.forEach(function (key) {
-      var c = SECTIONS[key]();
+      var c = SECTIONS[key](profile);
+      if (c.dialog) dialogs.insertAdjacentHTML("beforeend", c.dialog);
       var sec = document.createElement("section");
-      sec.className = "block";
+      sec.className = "block scene";
       sec.id = c.id;
       sec.setAttribute("data-section", key);
       sec.setAttribute("tabindex", "-1");
@@ -642,11 +662,36 @@ var SITE = {
       $all("[data-row]", sec).forEach(initRow);
       reveal(sec);
     });
+    initResumeDialog();
   }
 
-  /* ---------- State machine: intro → profiles → browse ---------- */
+  /* ---------- Full résumé dialog ---------- */
 
-  var screens = { intro: $("#intro"), profiles: $("#profiles"), browse: $("#browse") };
+  function initResumeDialog() {
+    var dlg = $("#resume-dialog");
+    if (!dlg) return;
+    function close() {
+      if (window.lenis) window.lenis.start();
+      if (dlg.open) dlg.close();
+    }
+    $all("[data-open-resume]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        if (typeof dlg.showModal !== "function") { dlg.setAttribute("open", ""); return; }
+        dlg.showModal();
+        if (window.lenis) window.lenis.stop();
+      });
+    });
+    $all("[data-close-resume]", dlg).forEach(function (b) { b.addEventListener("click", close); });
+    dlg.addEventListener("close", function () { if (window.lenis) window.lenis.start(); });
+    dlg.addEventListener("click", function (e) {
+      if (e.target === dlg) close();                       // click on the backdrop
+      if (e.target.closest && e.target.closest('a[href^="#"]')) close(); // in-page link: close, then follow it
+    });
+  }
+
+  /* ---------- State machine: intro → browse ---------- */
+
+  var screens = { intro: $("#intro"), browse: $("#browse") };
   var introTimer = null;
 
   // Lenis (js/smooth-scroll.js) is optional: always check window.lenis first.
@@ -661,13 +706,16 @@ var SITE = {
     scrollToTop();
     document.body.setAttribute("data-screen", name);
     if (window.lenis) {
-      if (name === "intro") window.lenis.stop();
-      else window.lenis.start();
+      if (name === "browse") window.lenis.start();
+      else window.lenis.stop();
     }
   }
 
+  function stage() { return window.GolbertStage; }
+
   function goIntro() {
     clearTimeout(introTimer);
+    if (stage()) stage().teardown();
     show("intro");
     // Restart the CSS animations each time the intro plays.
     $all(".intro > span").forEach(function (el) {
@@ -675,32 +723,25 @@ var SITE = {
     });
     screens.intro.focus({ preventScroll: true });
     store(KEY_INTRO, "1");
-    introTimer = setTimeout(goProfiles, 3000);
+    introTimer = setTimeout(goHome, 3000);
   }
 
-  function goProfiles() {
+  // There is only one profile, so the intro goes straight to the browse page.
+  function goHome() {
     clearTimeout(introTimer);
-    show("profiles");
-    var current = store(KEY_PROFILE);
-    var btn = $('.profile[data-profile="' + (current || "golbert") + '"]') || $(".profile");
-    btn.focus({ preventScroll: true });
-  }
-
-  function chooseProfile(id) {
-    store(KEY_PROFILE, id);
-    goBrowse(profileById(id));
+    goBrowse(SITE.profiles[0]);
   }
 
   function goBrowse(profile) {
+    if (stage()) stage().teardown();
     renderBrowse(profile);
     show("browse");
     if (window.lenis) window.lenis.resize(); // the sections were just reordered
+    if (stage()) stage().build(profile.id);  // js/stage.js: scene transitions (skipped for reduced motion / no GSAP)
     $("#hero-title").focus({ preventScroll: true });
   }
 
-  screens.intro.addEventListener("click", goProfiles);
-  $("#play-intro").addEventListener("click", goIntro);
-  $("#switch-profile").addEventListener("click", goProfiles);
+  screens.intro.addEventListener("click", goHome);
 
   var nav = $("#nav");
   var sentinel = $("#nav-sentinel");
@@ -714,8 +755,6 @@ var SITE = {
 
   var forceIntro = /[?&]intro=1(&|$)/.test(window.location.search);
   var seen = store(KEY_INTRO) === "1";
-  var saved = store(KEY_PROFILE);
   if (forceIntro || !seen) goIntro();
-  else if (saved) goBrowse(profileById(saved));
-  else goProfiles();
+  else goHome();
 })();
